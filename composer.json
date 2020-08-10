@@ -15,6 +15,12 @@
       "role": "Maintainer"
     }
   ],
+  "repositories": [        
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
   "require": {
         "drupal/matomo": "^1.9"
   }
