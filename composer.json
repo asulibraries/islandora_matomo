@@ -1,0 +1,21 @@
+{
+  "name": "fsulib/islandora_matomo_services",
+  "description": "Islandora Matomo Services module",
+  "type": "drupal-module",
+  "keywords": ["Drupal", "Islandora"],
+  "homepage": "https://github.com/fsulib/islandora_matomo_services",
+  "support": {
+    "issues": "https://github.com/fsulib/islandora_matomo_services/issues"
+  },
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "Bryan J. Brown",
+      "email": "bjbrown@fsu.edu",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+        "drupal/matomo": "^1.9"
+  }
+}
