@@ -3,6 +3,8 @@
 namespace Drupal\islandora_matomo_services;
 
 use Drupal\node\Entity\Node;
+use Drupal\media\Entity\Media;
+use Drupal\file\Entity\File;
 
 /**
  * Class IslandoraMatomoService.
@@ -70,6 +72,23 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       $sum = $sum + $file_downloads;
     }
     return $sum;
+  }
+
+  public function getFileFromMedia($mid) {
+    $media_file_fields = [
+      'audio'                   => 'field_media_audio_file',
+      'document'                => 'field_media_document',
+      'extracted_text'          => 'field_media_file',
+      'file'                    => 'field_media_file',
+      'fits_technical_metadata' => 'field_media_file',
+      'image'                   => 'field_media_image', 
+      'video'                   => 'field_media_video_file',
+    ];
+    $media = Media::load($mid);
+    $media_bundle = $media->bundle();
+    $media_file_field = $media_file_fields["{$media_bundle}"];
+    $media_file_id = $media->{$media_file_field}->target_id;
+    return $media_file_id;
   }
 
 }

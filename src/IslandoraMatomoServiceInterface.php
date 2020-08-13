@@ -11,5 +11,6 @@ interface IslandoraMatomoServiceInterface {
   public function getViewsForNode($nid);
   public function getDownloadsForFile($fid);
   public function getSummedDownloadsForFiles($fids);
+  public function getFileFromMedia($mid);
 
 }
