@@ -42,17 +42,14 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       endswitch;
       $request_url = $matomo_url . $query;
       $response = json_decode(file_get_contents($request_url), TRUE); 
-      $result = (int) $response[0]['nb_hits'];    
+      $result = (array_key_exists(0, $response) ? (int) $response[0]['nb_hits'] : 0);
       return $result;
     }
   }
 
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
-    $path = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
-    global $base_url;
-    $node_url = $base_url . $path;
-    $views = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($node_url, 'views');
+    $views = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($node->toUrl()->toString(), 'views');
     return $views;
   }
 
