@@ -72,8 +72,27 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
       endswitch;
       $request_url = $matomo_url . $query;
-      $response = json_decode(file_get_contents($request_url), TRUE); 
-      $result = (int) $response[0]['nb_hits'];    
+      try {
+        $response = $this->httpClient->get($request_url);
+        $response_body = $response->getBody();
+        $status_code = $response->getStatusCode();
+        if ($status_code != 200) {
+          \Drupal::logger('islandora matomo services')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
+        }
+        else {
+          $resource = json_decode($response_body, TRUE);
+          if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
+            \Drupal::logger('islandora matomo services')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
+            $result = 0;
+          }
+          else {
+            $result = (array_key_exists(0, $resource) ? (int) $resource[0]['nb_hits'] : 0);
+          }
+        }
+      }
+      catch (RequestException $e) {
+        \Drupal::logger('islandora matomo services')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
+      }
       return $result;
     }
   }
