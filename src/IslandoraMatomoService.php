@@ -56,7 +56,8 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     else {
       $current_date = date('Y-m-d', time());
       $date_range = "2000-01-01,{$current_date}";
-      switch ($mode):
+      $result = 0;
+      switch ($mode) :
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
