@@ -5,16 +5,32 @@ namespace Drupal\islandora_matomo_services;
 use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
 use Drupal\file\Entity\File;
+use Drupal\Core\Url;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Class IslandoraMatomoService.
+ *
+ * @param \GuzzleHttp\Client $client
+ *   Guzzle client.
  */
 class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
+  /**
+   * An http client.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
 
   /**
    * Constructs a new IslandoraMatomoService object.
+   *
+   * @param \GuzzleHttp\Client $httpClient
+   *   Guzzle client.
    */
-  public function __construct() {
+  public function __construct(Client $httpClient) {
+    $this->httpClient = $httpClient;
   }
 
   public function queryMatomoApi($url, $mode) {
