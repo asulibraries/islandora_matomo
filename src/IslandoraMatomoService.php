@@ -5,6 +5,7 @@ namespace Drupal\islandora_matomo_services;
 use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
 use Drupal\file\Entity\File;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -24,13 +25,23 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   protected $httpClient;
 
   /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  private $messenger;
+
+  /**
    * Constructs a new IslandoraMatomoService object.
    *
    * @param \GuzzleHttp\Client $httpClient
    *   Guzzle client.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(Client $httpClient) {
+  public function __construct(Client $httpClient, MessengerInterface $messenger) {
     $this->httpClient = $httpClient;
+    $this->messenger = $messenger;
   }
 
   public function queryMatomoApi($url, $mode) {
@@ -39,7 +50,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
     if ($matomo_url == '' || $matomo_id == '') {
-      drupal_set_message(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
+      $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
       return NULL;
     }
     else {
@@ -53,8 +64,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
           $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
         default:
-          drupal_set_message(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
-          return NULL;         
+          $this->messenger->addMessage(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
+          $result = 0;
+
       endswitch;
       $request_url = $matomo_url . $query;
       $response = json_decode(file_get_contents($request_url), TRUE); 
