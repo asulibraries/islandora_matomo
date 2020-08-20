@@ -93,7 +93,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Get download counts for single file.
    */
   public function getDownloadsForFile($fid) {
-    $file = file_load($fid);
+    $file = File::load($fid);
     $file_uri = $file->getFileUri();
     $file_url = file_create_url($file_uri);
     $downloads = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($file_url, 'downloads');
