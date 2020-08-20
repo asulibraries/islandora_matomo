@@ -12,9 +12,6 @@ use GuzzleHttp\Exception\RequestException;
 
 /**
  * Class IslandoraMatomoService.
- *
- * @param \GuzzleHttp\Client $client
- *   Guzzle client.
  */
 class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
@@ -63,9 +60,11 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
+
         case 'downloads':
           $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
+
         default:
           $this->messenger->addMessage(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
           $result = 0;
@@ -124,7 +123,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       'extracted_text'          => 'field_media_file',
       'file'                    => 'field_media_file',
       'fits_technical_metadata' => 'field_media_file',
-      'image'                   => 'field_media_image', 
+      'image'                   => 'field_media_image',
       'video'                   => 'field_media_video_file',
     ];
     $media = Media::load($mid);
