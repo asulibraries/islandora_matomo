@@ -44,6 +44,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $this->messenger = $messenger;
   }
 
+  /**
+   * Query the Matomo API.
+   */
   public function queryMatomoApi($url, $mode) {
     $url = rtrim($url, '/');
     $matomo_config = \Drupal::config('matomo.settings');
@@ -75,6 +78,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     }
   }
 
+  /**
+   * Get views for node.
+   */
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
     $path = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
@@ -84,6 +90,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     return $views;
   }
 
+  /**
+   * Get download counts for single file.
+   */
   public function getDownloadsForFile($fid) {
     $file = file_load($fid);
     $file_uri = $file->getFileUri();
@@ -92,6 +101,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     return $downloads;
   }
 
+  /**
+   * Calculate sum of downloads.
+   */
   public function getSummedDownloadsForFiles($fids) {
     $sum = 0;
     foreach ($fids as $fid) {
@@ -102,6 +114,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     return $sum;
   }
 
+  /**
+   * Get files from media.
+   */
   public function getFileFromMedia($mid) {
     $media_file_fields = [
       'audio'                   => 'field_media_audio_file',
