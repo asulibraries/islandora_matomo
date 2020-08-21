@@ -4,4 +4,4 @@ services:
     arguments: ['islandora_matomo_services']
   islandora_matomo_services.default:
     class: Drupal\islandora_matomo_services\IslandoraMatomoService
-    arguments: []
+    arguments: ['@http_client', '@messenger']

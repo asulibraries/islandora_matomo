@@ -5,65 +5,124 @@ namespace Drupal\islandora_matomo_services;
 use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
 use Drupal\file\Entity\File;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Url;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Class IslandoraMatomoService.
  */
 class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
+  /**
+   * An http client.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  private $messenger;
 
   /**
    * Constructs a new IslandoraMatomoService object.
+   *
+   * @param \GuzzleHttp\Client $httpClient
+   *   Guzzle client.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct() {
+  public function __construct(Client $httpClient, MessengerInterface $messenger) {
+    $this->httpClient = $httpClient;
+    $this->messenger = $messenger;
   }
 
+  /**
+   * Query the Matomo API.
+   */
   public function queryMatomoApi($url, $mode) {
     $url = rtrim($url, '/');
     $matomo_config = \Drupal::config('matomo.settings');
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
     if ($matomo_url == '' || $matomo_id == '') {
-      drupal_set_message(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
+      $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
       return NULL;
     }
     else {
       $current_date = date('Y-m-d', time());
       $date_range = "2000-01-01,{$current_date}";
-      switch ($mode):
+      $result = 0;
+      switch ($mode) :
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
+
         case 'downloads':
           $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
           break;
+
         default:
-          drupal_set_message(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
-          return NULL;         
+          $this->messenger->addMessage(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
+          $result = 0;
+
       endswitch;
       $request_url = $matomo_url . $query;
-      $response = json_decode(file_get_contents($request_url), TRUE); 
-      $result = (int) $response[0]['nb_hits'];    
+      try {
+        $response = $this->httpClient->get($request_url);
+        $response_body = $response->getBody();
+        $status_code = $response->getStatusCode();
+        if ($status_code != 200) {
+          \Drupal::logger('islandora matomo services')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
+        }
+        else {
+          $resource = json_decode($response_body, TRUE);
+          if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
+            \Drupal::logger('islandora matomo services')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
+            $result = 0;
+          }
+          else {
+            $result = (array_key_exists(0, $resource) ? (int) $resource[0]['nb_hits'] : 0);
+          }
+        }
+      }
+      catch (RequestException $e) {
+        \Drupal::logger('islandora matomo services')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
+      }
       return $result;
     }
   }
 
+  /**
+   * Get views for node.
+   */
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
-    $path = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
+    $path = Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
     global $base_url;
     $node_url = $base_url . $path;
     $views = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($node_url, 'views');
     return $views;
   }
 
+  /**
+   * Get download counts for single file.
+   */
   public function getDownloadsForFile($fid) {
-    $file = file_load($fid);
+    $file = File::load($fid);
     $file_uri = $file->getFileUri();
     $file_url = file_create_url($file_uri);
     $downloads = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($file_url, 'downloads');
     return $downloads;
   }
 
+  /**
+   * Calculate sum of downloads.
+   */
   public function getSummedDownloadsForFiles($fids) {
     $sum = 0;
     foreach ($fids as $fid) {
@@ -74,6 +133,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     return $sum;
   }
 
+  /**
+   * Get files from media.
+   */
   public function getFileFromMedia($mid) {
     $media_file_fields = [
       'audio'                   => 'field_media_audio_file',
@@ -81,7 +143,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       'extracted_text'          => 'field_media_file',
       'file'                    => 'field_media_file',
       'fits_technical_metadata' => 'field_media_file',
-      'image'                   => 'field_media_image', 
+      'image'                   => 'field_media_image',
       'video'                   => 'field_media_video_file',
     ];
     $media = Media::load($mid);
