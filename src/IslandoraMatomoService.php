@@ -50,7 +50,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
     $matomo_token = \Drupal::config('ldbase_admin.settings')->get('ldbase_matomo_user_token');
-    $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : ''); 
+    $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : ''); // If no token is configured, assume anonymous viewing
     if ($matomo_url == '' || $matomo_id == '') {
       $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
       return NULL;
