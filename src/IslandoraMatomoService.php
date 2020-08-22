@@ -49,7 +49,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $matomo_config = \Drupal::config('matomo.settings');
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
-    $matomo_token = \Drupal::config('ldbase_admin.settings')->get('ldbase_matomo_user_token');
+    $matomo_hits_or_visits = \Drupal::config('islandora_matomo.settings')->get('islandora_matomo_hits_or_visits');
+    $matomo_metric = ($matomo_hits_or_visits == 0 ? 'nb_hits' : 'nb_visits');
+    $matomo_token = \Drupal::config('islandora_matomo.settings')->get('islandora_matomo_user_token');
     $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : ''); // If no token is configured, assume anonymous viewing
     if ($matomo_url == '' || $matomo_id == '') {
       $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
@@ -88,7 +90,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
             $result = 0;
           }
           else {
-            $result = (array_key_exists(0, $resource) ? (int) $resource[0]['nb_hits'] : 0);
+            $result = (array_key_exists(0, $resource) ? (int) $resource[0][$matomo_metric] : 0);
           }
         }
       }

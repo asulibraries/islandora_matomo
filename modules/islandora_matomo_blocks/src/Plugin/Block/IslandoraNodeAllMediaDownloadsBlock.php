@@ -27,7 +27,6 @@ class IslandoraNodeAllMediaDownloadsBlock extends BlockBase {
       // Get views for node
       $node = \Drupal::routeMatch()->getParameter('node'); 
       $views = \Drupal::service('islandora_matomo.default')->getViewsForNode($node->id());
-      
       $mids = \Drupal::entityQuery('media')
         ->condition('field_media_of', $node->id())
         ->execute();
@@ -38,16 +37,12 @@ class IslandoraNodeAllMediaDownloadsBlock extends BlockBase {
         $media_data[$mid]['label'] = $media->label();
         $media_data[$mid]['downloads'] = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
       }
-
       $content = "<div id='islandora-node-all-media-download-block-wrapper' class='islandora-node-all-media-download-block'>";
       $content .= "<span id='islandora-node-all-media-download-block-views' class='islandora-node-all-media-download-block'>Views for '{$node->label()}': {$views}</span><br/>";
-
       foreach ($media_data as $data) {      
         $content .= "<span class='islandora-node-all-media-download-block islandora-node-all-media-download-block-download'>Downloads for '{$data['label']}': {$data['downloads']}</span><br/>";
       }
-
       $content .= "</div>";
-
     }
     else {
       $content = "This page is not a node. Please restrict this block's configuration to display on nodes only.";

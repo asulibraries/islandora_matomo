@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\islandora_matomo_services;
+namespace Drupal\islandora_matomo;
 
 /**
  * Interface IslandoraMatomoServiceInterface.

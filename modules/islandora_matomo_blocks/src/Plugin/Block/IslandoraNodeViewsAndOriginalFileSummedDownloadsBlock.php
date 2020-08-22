@@ -42,16 +42,12 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
         $fids[] = $fid;
       }
       $downloads = \Drupal::service('islandora_matomo.default')->getSummedDownloadsForFiles($fids);
-      dsm($downloads);
-
-
       $content = <<<EOS
 <div id='islandora-node-and-original-files-download-block-wrapper' class='islandora-node-and-original-files-download-block'>
   <span id='islandora-node-and-original-files-download-block-views' class='islandora-node-and-original-files-download-block'>Views: {$views}</span><br/>
   <span id='islandora-node-and-original-files-download-block-downloads' class='islandora-node-and-original-files-download-block'>Downloads: {$downloads}</span>
 </div>
 EOS;
-
     }
     else {
       $content = "This page is not a node. Please restrict this block's configuration to display on nodes only.";

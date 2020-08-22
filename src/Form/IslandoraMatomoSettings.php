@@ -37,6 +37,17 @@ class IslandoraMatomoSettings extends ConfigFormBase {
       '#default_value' => ( !empty($config->get('islandora_matomo_user_token')) ? $config->get('islandora_matomo_user_token') : '' ),
     ];
 
+    $form['islandora_matomo_hits_or_visits'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Count hits or visits?'),
+      '#description' => $this->t('Hits are the total number of times a page was loaded or a file downloaded, while visits counts all page loads and file downloads from the same visitor within 30 minutes as a single visit.'),
+      '#default_value' => $config->get('islandora_matomo_hits_or_visits'),
+      '#options' => array (
+        0 => $this->t('Hits'),
+	1 => $this->t('Visits'),
+      ),
+    ];
+
     return $form;
   }
 
@@ -46,6 +57,7 @@ class IslandoraMatomoSettings extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('islandora_matomo.settings');
     $config->set('islandora_matomo_user_token', $form_state->getValue('islandora_matomo_user_token'));
+    $config->set('islandora_matomo_hits_or_visits', $form_state->getValue('islandora_matomo_hits_or_visits'));
     $config->save();
     parent::submitForm($form, $form_state);
   }
