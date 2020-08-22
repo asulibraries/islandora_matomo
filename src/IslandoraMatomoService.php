@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\islandora_matomo_services;
+namespace Drupal\islandora_matomo;
 
 use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
@@ -77,12 +77,12 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         $response_body = $response->getBody();
         $status_code = $response->getStatusCode();
         if ($status_code != 200) {
-          \Drupal::logger('islandora matomo services')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
+          \Drupal::logger('islandora matomo')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
         }
         else {
           $resource = json_decode($response_body, TRUE);
           if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
-            \Drupal::logger('islandora matomo services')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
+            \Drupal::logger('islandora matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
             $result = 0;
           }
           else {
@@ -91,7 +91,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         }
       }
       catch (RequestException $e) {
-        \Drupal::logger('islandora matomo services')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
+        \Drupal::logger('islandora matomo')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
       }
       return $result;
     }
@@ -103,7 +103,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
     $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString(); 
-    $views = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($node_url, 'views');
+    $views = \Drupal::service('islandora_matomo.default')->queryMatomoApi($node_url, 'views');
     return $views;
   }
 
@@ -114,7 +114,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $file = File::load($fid);
     $file_uri = $file->getFileUri();
     $file_url = file_create_url($file_uri);
-    $downloads = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($file_url, 'downloads');
+    $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($file_url, 'downloads');
     return $downloads;
   }
 
@@ -124,7 +124,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   public function getSummedDownloadsForFiles($fids) {
     $sum = 0;
     foreach ($fids as $fid) {
-      $file_downloads = \Drupal::service('islandora_matomo_services.default')->getDownloadsForFile($fid);
+      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
       global $sum;
       $sum = $sum + $file_downloads;
     }

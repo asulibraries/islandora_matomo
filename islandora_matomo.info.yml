@@ -1,0 +1,7 @@
+name: Islandora Matomo
+type: module
+description: 'Ways to use Matomo with Islandora objects.'
+package: Islandora
+core: 8.x
+dependencies:
+    - matomo

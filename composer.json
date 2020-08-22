@@ -1,11 +1,11 @@
 {
-  "name": "fsulib/islandora_matomo_services",
-  "description": "Islandora Matomo Services module",
+  "name": "fsulib/islandora_matomo",
+  "description": "Islandora Matomo module",
   "type": "drupal-module",
   "keywords": ["Drupal", "Islandora"],
-  "homepage": "https://github.com/fsulib/islandora_matomo_services",
+  "homepage": "https://github.com/fsulib/islandora_matomo",
   "support": {
-    "issues": "https://github.com/fsulib/islandora_matomo_services/issues"
+    "issues": "https://github.com/fsulib/islandora_matomo/issues"
   },
   "license": "GPL-2.0+",
   "authors": [

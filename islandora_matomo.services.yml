@@ -1,0 +1,7 @@
+services:
+  logger.channel.islandora_matomo:
+    parent: logger.channel_base
+    arguments: ['islandora_matomo']
+  islandora_matomo.default:
+    class: Drupal\islandora_matomo\IslandoraMatomoService
+    arguments: ['@http_client', '@messenger']

@@ -1,0 +1,8 @@
+name: Islandora Matomo Blocks 
+type: module
+description: 'Blocks that display Matomo analytics for Islandora content.'
+package: Islandora 
+core: 8.x
+dependencies:
+  - 'islandora_matomo:islandora_matomo'
+
