@@ -49,6 +49,8 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $matomo_config = \Drupal::config('matomo.settings');
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
+    $matomo_token = \Drupal::config('ldbase_admin.settings')->get('ldbase_matomo_user_token');
+    $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : ''); 
     if ($matomo_url == '' || $matomo_id == '') {
       $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
       return NULL;
@@ -59,11 +61,11 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       $result = 0;
       switch ($mode) :
         case 'views':
-          $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
+          $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
 
         case 'downloads':
-          $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json";
+          $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
 
         default:
@@ -77,12 +79,12 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         $response_body = $response->getBody();
         $status_code = $response->getStatusCode();
         if ($status_code != 200) {
-          \Drupal::logger('islandora matomo')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
+          \Drupal::logger('islandora_matomo')->warning($status_code . " returned from Matomo : <pre>" . print_r($response, TRUE) . "</pre>");
         }
         else {
           $resource = json_decode($response_body, TRUE);
           if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
-            \Drupal::logger('islandora matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
+            \Drupal::logger('islandora_matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
             $result = 0;
           }
           else {
@@ -91,7 +93,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         }
       }
       catch (RequestException $e) {
-        \Drupal::logger('islandora matomo')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
+        \Drupal::logger('islandora_matomo')->warning("Unable to return data from Matomo : <pre>" . $e->getMessage() . "</pre>");
       }
       return $result;
     }
