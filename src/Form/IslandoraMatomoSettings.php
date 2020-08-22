@@ -5,9 +5,9 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class IslandoraMatomoForm.
+ * Class IslandoraMatomoSettings.
  */
-class IslandoraMatomoForm extends ConfigFormBase {
+class IslandoraMatomoSettings extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
