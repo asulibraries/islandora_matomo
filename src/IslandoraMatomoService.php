@@ -102,9 +102,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    */
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
-    $path = Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
-    global $base_url;
-    $node_url = $base_url . $path;
+    $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString(); 
     $views = \Drupal::service('islandora_matomo_services.default')->queryMatomoApi($node_url, 'views');
     return $views;
   }
