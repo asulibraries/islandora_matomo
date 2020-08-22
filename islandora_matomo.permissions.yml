@@ -1,0 +1,4 @@
+administer islandora matomo settings:
+  title: 'Administer Islandora Matomo settings'
+  description: 'Access and manage configuration for Islandora Matomo'
+  restrict access: TRUE

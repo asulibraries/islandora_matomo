@@ -1,0 +1,5 @@
+system.islandora_matomo_settings:
+  title: 'Islandora Matomo'
+  parent: system.admin_config_islandora
+  route_name: islandora_matomo.settings
+  description: 'Configure Islandora Matomo settings.'

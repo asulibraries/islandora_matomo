@@ -1,0 +1,7 @@
+islandora_matomo.settings:
+  path: '/admin/config/islandora/matomo'
+  defaults:
+    _form: '\Drupal\islandora_matomo\Form\IslandoraMatomoSettingsForm'
+    _title: 'Islandora Matomo Settings'
+  requirements:
+    _permission: 'administer islandora matomo settings'
