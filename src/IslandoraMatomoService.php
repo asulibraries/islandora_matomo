@@ -62,8 +62,8 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       return NULL;
     }
     else {
-      $date_range_start = (array_key_exists($params['start_date'] ? $params['start_date'] : '2000-01-01'));
-      $date_range_end = (array_key_exists($params['end_date'] ? $params['end_date'] : date('Y-m-d', time())));
+      $date_range_start = (array_key_exists('start_date', $params) ? $params['start_date'] : '2000-01-01');
+      $date_range_end = (array_key_exists('end_date', $params) ? $params['end_date'] : date('Y-m-d', time()));
       $date_range = "{$date_range_start},{$date_range_end}";
       $result = 0;
       switch ($params['mode']) :
@@ -129,7 +129,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $file_uri = $file->getFileUri();
     $params['url'] = file_create_url($file_uri);
     $params['mode'] = 'downloads';
-    $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($file_url, 'downloads');
+    $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
     return $downloads;
   }
 
