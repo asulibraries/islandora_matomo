@@ -43,9 +43,13 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
   /**
    * Query the Matomo API.
+   *
+   * @param array $params
+   *  Array that must include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
+   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
    */
-  public function queryMatomoApi($url, $mode) {
-    $url = rtrim($url, '/');
+  public function queryMatomoApi(array $params) {
+    $url = rtrim($params['url'], '/');
     $matomo_config = \Drupal::config('matomo.settings');
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
@@ -58,10 +62,11 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       return NULL;
     }
     else {
-      $current_date = date('Y-m-d', time());
-      $date_range = "2000-01-01,{$current_date}";
+      $date_range_start = (array_key_exists($params['start_date'] ? $params['start_date'] : '2000-01-01'));
+      $date_range_end = (array_key_exists($params['end_date'] ? $params['end_date'] : date('Y-m-d', time())));
+      $date_range = "{$date_range_start},{$date_range_end}";
       $result = 0;
-      switch ($mode) :
+      switch ($params['mode']) :
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
@@ -103,21 +108,27 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
   /**
    * Get views for node.
+   *
+   * @param array $params
+   *  Array that must include $params['nid'], the node ID of the object to be queried.
+   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
    */
-  public function getViewsForNode($nid) {
-    $node = Node::load($nid);
-    $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString(); 
-    $views = \Drupal::service('islandora_matomo.default')->queryMatomoApi($node_url, 'views');
+  public function getViewsForNode(array $params) {
+    $node = Node::load($params['nid']);
+    $params['url'] = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString(); 
+    $params['mode'] = 'views';
+    $views = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
     return $views;
   }
 
   /**
    * Get download counts for single file.
    */
-  public function getDownloadsForFile($fid) {
-    $file = File::load($fid);
+  public function getDownloadsForFile(array $params) {
+    $file = File::load($params['fid']);
     $file_uri = $file->getFileUri();
-    $file_url = file_create_url($file_uri);
+    $params['url'] = file_create_url($file_uri);
+    $params['mode'] = 'downloads';
     $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($file_url, 'downloads');
     return $downloads;
   }
@@ -125,10 +136,11 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Calculate sum of downloads.
    */
-  public function getSummedDownloadsForFiles($fids) {
+  public function getSummedDownloadsForFiles(array $params) {
     $sum = 0;
-    foreach ($fids as $fid) {
-      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
+    foreach ($params['fids'] as $fid) {
+      $params['fid'] = $fid;
+      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($params);
       global $sum;
       $sum = $sum + $file_downloads;
     }
