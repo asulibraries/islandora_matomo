@@ -46,7 +46,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    *
    * @param array $params
    *  Array that must include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
-   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function queryMatomoApi(array $params) {
     $url = rtrim($params['url'], '/');
@@ -111,7 +111,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    *
    * @param array $params
    *  Array that must include $params['nid'], the node ID of the node to be queried.
-   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getViewsForNode(array $params) {
     $node = Node::load($params['nid']);
@@ -126,7 +126,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    *
    * @param array $params
    *  Array that must include $params['fid'], the file entity ID of the file to be queried.
-   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getDownloadsForFile(array $params) {
     $file = File::load($params['fid']);
@@ -142,7 +142,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    *
    * @param array $params
    *  Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
-   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getSummedDownloadsForFiles(array $params) {
     $sum = 0;
