@@ -1,17 +1,22 @@
 {
-  "name": "fsulib/islandora_matomo",
+  "name": "asulibraries/islandora_matomo",
   "description": "Islandora Matomo module",
   "type": "drupal-module",
   "keywords": ["Drupal", "Islandora"],
-  "homepage": "https://github.com/fsulib/islandora_matomo",
+  "homepage": "https://github.com/asulibraries/islandora_matomo",
   "support": {
-    "issues": "https://github.com/fsulib/islandora_matomo/issues"
+    "issues": "https://github.com/asulibraries/islandora_matomo/issues"
   },
   "license": "GPL-2.0+",
   "authors": [
     {
-      "name": "Bryan J. Brown",
-      "email": "bjbrown@fsu.edu",
+      "name": "Eli Zoller",
+      "email": "eli.zoller@asu.edu",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Willow Gillingham",
+      "email": "willow.gillingham@asu.edu",
       "role": "Maintainer"
     }
   ],
