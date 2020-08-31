@@ -110,7 +110,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Get views for node.
    *
    * @param array $params
-   *  Array that must include $params['nid'], the node ID of the object to be queried.
+   *  Array that must include $params['nid'], the node ID of the node to be queried.
    *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getViewsForNode(array $params) {
@@ -123,6 +123,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
   /**
    * Get download counts for single file.
+   *
+   * @param array $params
+   *  Array that must include $params['fid'], the file entity ID of the file to be queried.
+   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getDownloadsForFile(array $params) {
     $file = File::load($params['fid']);
@@ -135,6 +139,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
   /**
    * Calculate sum of downloads.
+   *
+   * @param array $params
+   *  Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
+   *  May optionally include  $parms['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getSummedDownloadsForFiles(array $params) {
     $sum = 0;
@@ -148,7 +156,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   }
 
   /**
-   * Get files from media.
+   * Get file-containing field from arbitrary Islandora media entities.
+   *
+   * @param int $mid
+   * An integer representing a media entity ID 
    */
   public function getFileFromMedia($mid) {
     $media_file_fields = [
