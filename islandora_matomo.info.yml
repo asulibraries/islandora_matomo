@@ -5,3 +5,4 @@ package: Islandora
 core: 8.x
 dependencies:
     - matomo
+core_version_requirement: ^8 || ^9
