@@ -21,8 +21,8 @@ class IslandoraNodeViewsBlock extends BlockBase {
    */
   public function build() {
     if (\Drupal::routeMatch()->getRouteName() == 'entity.node.canonical') {
-      $node = \Drupal::routeMatch()->getParameter('node'); 
-      $views = \Drupal::service('islandora_matomo.default')->getViewsForNode($node->id());
+      $node = \Drupal::routeMatch()->getParameter('node');
+      $views = \Drupal::service('islandora_matomo.default')->getViewsForNode(['nid' => $node->id()]);
       $content = <<<EOS
 <div id='islandora-node-views-block-wrapper' class='islandora-node-views-block'>
   <span id='islandora-node-views-block-views' class='islandora-node-views-block'>Views: {$views}</span>
