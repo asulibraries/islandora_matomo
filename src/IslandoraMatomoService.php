@@ -87,7 +87,6 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
       endswitch;
       $request_url = $matomo_url . $query;
-
       try {
         $response = $this->httpClient->get($request_url);
         $response_body = $response->getBody();
@@ -146,7 +145,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   public function getAllPages(string $segment = '') {
     $params = [
       'mode' => 'items_in_matomo',
-      'segment' => $segment,
+      'segment' => urlencode($segment),
     ];
     $matomo_data = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
     return $matomo_data;
