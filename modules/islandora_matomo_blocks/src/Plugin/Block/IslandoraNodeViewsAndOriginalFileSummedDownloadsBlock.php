@@ -25,9 +25,8 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
     if (\Drupal::routeMatch()->getRouteName() == 'entity.node.canonical') {
 
       // Get views for node
-      $node = \Drupal::routeMatch()->getParameter('node'); 
-      $views = \Drupal::service('islandora_matomo.default')->getViewsForNode($node->id());
-      
+      $node = \Drupal::routeMatch()->getParameter('node');
+      $views = \Drupal::service('islandora_matomo.default')->getViewsForNode(['nid' => $node->id()]);
       // Get downloads for Original File media of node
       $original_file_tid = key(\Drupal::entityTypeManager()
         ->getStorage('taxonomy_term')
@@ -41,7 +40,7 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
         $fid = \Drupal::service('islandora_matomo.default')->getFileFromMedia($mid);
         $fids[] = $fid;
       }
-      $downloads = \Drupal::service('islandora_matomo.default')->getSummedDownloadsForFiles($fids);
+      $downloads = \Drupal::service('islandora_matomo.default')->getSummedDownloadsForFiles(['fids' => $fids]);
       $content = <<<EOS
 <div id='islandora-node-and-original-files-download-block-wrapper' class='islandora-node-and-original-files-download-block'>
   <span id='islandora-node-and-original-files-download-block-views' class='islandora-node-and-original-files-download-block'>Views: {$views}</span><br/>

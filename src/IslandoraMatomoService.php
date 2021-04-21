@@ -43,6 +43,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
   /**
    * Query the Matomo API.
+   *
+   * @param array $params
+   *  Array that must include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function queryMatomoApi(string $value, string $mode) {
     $matomo_config = \Drupal::config('matomo.settings');
@@ -61,7 +65,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       $date_range = "2000-01-01,{$current_date}";
       $url = rtrim($value, '/');
       $result = 0;
-      switch ($mode) :
+      switch ($params['mode']) :
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
@@ -81,7 +85,6 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
 
       endswitch;
       $request_url = $matomo_url . $query;
-echo $request_url . "\n";
 
       try {
         $response = $this->httpClient->get($request_url);
@@ -122,6 +125,10 @@ echo $request_url . "\n";
 
   /**
    * Get views for node.
+   *
+   * @param array $params
+   *  Array that must include $params['nid'], the node ID of the node to be queried.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
@@ -140,6 +147,10 @@ echo $request_url . "\n";
 
   /**
    * Get download counts for single file.
+   *
+   * @param array $params
+   *  Array that must include $params['fid'], the file entity ID of the file to be queried.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getDownloadsForFile($fid) {
     $file = File::load($fid);
@@ -151,19 +162,27 @@ echo $request_url . "\n";
 
   /**
    * Calculate sum of downloads.
+   *
+   * @param array $params
+   *  Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
+   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
-  public function getSummedDownloadsForFiles($fids) {
-    $sum = 0;
-    foreach ($fids as $fid) {
-      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
-      global $sum;
-      $sum = $sum + $file_downloads;
+  public function getSummedDownloadsForFiles(array $params) {
+    $_islandora_matomo_sum = 0;
+    foreach ($params['fids'] as $fid) {
+      $params['fid'] = $fid;
+      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($params);
+      global $_islandora_matomo_sum;
+      $_islandora_matomo_sum = $_islandora_matomo_sum + $file_downloads;
     }
-    return $sum;
+    return $_islandora_matomo_sum;
   }
 
   /**
-   * Get files from media.
+   * Get file-containing field from arbitrary Islandora media entities.
+   *
+   * @param int $mid
+   * An integer representing a media entity ID.
    */
   public function getFileFromMedia($mid) {
     $media_file_fields = [
