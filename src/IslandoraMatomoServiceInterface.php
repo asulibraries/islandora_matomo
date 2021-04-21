@@ -9,13 +9,13 @@ interface IslandoraMatomoServiceInterface {
 
   public function queryMatomoApi(string $value, string $mode);
 
-  public function getViewsForNode($nid);
+  public function getViewsForNode(int $nid);
 
-  public function getDownloadsForFile($fid);
+  public function getDownloadsForFile(int $fid);
 
-  public function getSummedDownloadsForFiles($fids);
+  public function getSummedDownloadsForFiles(array $fids);
 
-  public function getFileFromMedia($mid);
+  public function getFileFromMedia(int $mid);
 
   public function getAllPages(string $segment = '');
 

@@ -44,9 +44,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Query the Matomo API.
    *
-   * @param array $params
-   *  Array that must include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   * @param string $mode
+   *   The mode to call the Matomo API.
+   * @param string $value
+   *   A string value that is related to the call for the given $mode.
    */
   public function queryMatomoApi(string $value, string $mode) {
     $matomo_config = \Drupal::config('matomo.settings');
@@ -65,7 +66,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       $date_range = "2000-01-01,{$current_date}";
       $url = rtrim($value, '/');
       $result = 0;
-      switch ($params['mode']) :
+      switch ($mode) :
         case 'views':
           $query = "index.php?module=API&method=Actions.getPageUrl&pageUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
@@ -80,7 +81,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
           break;
 
         default:
-          $this->messenger->addMessage(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
+          $this->messenger->addMessage(t('Error: Invalid mode "{' . $mode . '}" provided to islandora_matomo_service.'), 'error');
           $result = 0;
 
       endswitch;
@@ -126,11 +127,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Get views for node.
    *
-   * @param array $params
-   *  Array that must include $params['nid'], the node ID of the node to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   * @param int $nid
+   *  The node ID of the node to be queried.
    */
-  public function getViewsForNode($nid) {
+  public function getViewsForNode(int $nid) {
     $node = Node::load($nid);
     $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString();
     $views = \Drupal::service('islandora_matomo.default')->queryMatomoApi($node_url, 'views');
@@ -148,11 +148,10 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Get download counts for single file.
    *
-   * @param array $params
-   *  Array that must include $params['fid'], the file entity ID of the file to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   * @param int $fid
+   *  The file entity ID of the file to be queried.
    */
-  public function getDownloadsForFile($fid) {
+  public function getDownloadsForFile(int $fid) {
     $file = File::load($fid);
     $file_uri = $file->getFileUri();
     $file_url = file_create_url($file_uri);
@@ -166,7 +165,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * @param array $fids
    *  The set of file identifiers that will be summed around.
    */
-  public function getSummedDownloadsForFiles($fids) {
+  public function getSummedDownloadsForFiles(array $fids) {
     $sum = 0;
     foreach ($fids as $fid) {
       $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
@@ -182,7 +181,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * @param int $mid
    * An integer representing a media entity ID.
    */
-  public function getFileFromMedia($mid) {
+  public function getFileFromMedia(int $mid) {
     $media_file_fields = [
       'audio'                   => 'field_media_audio_file',
       'document'                => 'field_media_document',
