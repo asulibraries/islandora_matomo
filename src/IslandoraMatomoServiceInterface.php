@@ -7,10 +7,16 @@ namespace Drupal\islandora_matomo;
  */
 interface IslandoraMatomoServiceInterface {
 
-  public function queryMatomoApi($url, $mode);
+  public function queryMatomoApi(string $value, string $mode);
+
   public function getViewsForNode($nid);
+
   public function getDownloadsForFile($fid);
+
   public function getSummedDownloadsForFiles($fids);
+
   public function getFileFromMedia($mid);
+
+  public function getAllPages(string $segment = '');
 
 }

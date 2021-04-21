@@ -44,8 +44,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Query the Matomo API.
    */
-  public function queryMatomoApi($url, $mode) {
-    $url = rtrim($url, '/');
+  public function queryMatomoApi(string $value, string $mode) {
     $matomo_config = \Drupal::config('matomo.settings');
     $matomo_url = $matomo_config->get('url_http');
     $matomo_id = $matomo_config->get('site_id');
@@ -60,6 +59,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     else {
       $current_date = date('Y-m-d', time());
       $date_range = "2000-01-01,{$current_date}";
+      $url = rtrim($value, '/');
       $result = 0;
       switch ($mode) :
         case 'views':
@@ -70,12 +70,19 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
           $query = "index.php?module=API&method=Actions.getDownload&downloadUrl={$url}&idSite={$matomo_id}&period=range&date={$date_range}&format=json{$matomo_token_param}";
           break;
 
+        case 'items_in_matomo':
+          $segment_encoded = 'pageUrl=^' . urlencode($value);
+          $query = "index.php?module=API&method=Actions.getPageUrls&idSite={$matomo_id}&segment={$segment_encoded}&expanded=1&period=range&date={$date_range}&format=json{$matomo_token_param}";
+          break;
+
         default:
           $this->messenger->addMessage(t('Error: Invalid mode "{$mode}" provided to islandora_matomo_service.'), 'error');
           $result = 0;
 
       endswitch;
       $request_url = $matomo_url . $query;
+echo $request_url . "\n";
+
       try {
         $response = $this->httpClient->get($request_url);
         $response_body = $response->getBody();
@@ -85,12 +92,24 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
         }
         else {
           $resource = json_decode($response_body, TRUE);
-          if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
-            \Drupal::logger('islandora_matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
-            $result = 0;
-          }
-          else {
-            $result = (array_key_exists(0, $resource) ? (int) $resource[0][$matomo_metric] : 0);
+          if ($resource) {
+            if ($mode == 'items_in_matomo') {
+              $node_views = [];
+              if (array_key_exists('subtable', $resource[0])) {
+                foreach ($resource[0]['subtable'] as $k => $metrics) {
+                  $nid = ltrim($metrics['label'], "/");
+                  $node_views[$nid] = $metrics[$matomo_metric];
+                }
+              }
+              $result = $node_views;
+            } else {
+              if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
+                \Drupal::logger('islandora_matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
+                $result = 0;
+              } else {
+                $result = (array_key_exists(0, $resource) ? (int) $resource[0][$matomo_metric] : 0);
+              }
+            }
           }
         }
       }
@@ -106,9 +125,17 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    */
   public function getViewsForNode($nid) {
     $node = Node::load($nid);
-    $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString(); 
+    $node_url = \Drupal::request()->getSchemeAndHttpHost() . $node->toUrl()->toString();
     $views = \Drupal::service('islandora_matomo.default')->queryMatomoApi($node_url, 'views');
     return $views;
+  }
+
+  /**
+   * Get views for node.
+   */
+  public function getAllPages(string $segment = '') {
+    $matomo_data = \Drupal::service('islandora_matomo.default')->queryMatomoApi($segment, 'items_in_matomo');
+    return $matomo_data;
   }
 
   /**

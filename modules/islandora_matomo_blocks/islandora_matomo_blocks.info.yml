@@ -3,6 +3,7 @@ type: module
 description: 'Blocks that display Matomo analytics for Islandora content.'
 package: Islandora 
 core: 8.x
+core_version_requirement: ^8 || ^9
 dependencies:
   - 'islandora_matomo:islandora_matomo'
 
