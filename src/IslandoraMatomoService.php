@@ -163,19 +163,17 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
   /**
    * Calculate sum of downloads.
    *
-   * @param array $params
-   *  Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   * @param array $fids
+   *  The set of file identifiers that will be summed around.
    */
-  public function getSummedDownloadsForFiles(array $params) {
-    $_islandora_matomo_sum = 0;
-    foreach ($params['fids'] as $fid) {
-      $params['fid'] = $fid;
-      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($params);
-      global $_islandora_matomo_sum;
-      $_islandora_matomo_sum = $_islandora_matomo_sum + $file_downloads;
+  public function getSummedDownloadsForFiles($fids) {
+    $sum = 0;
+    foreach ($fids as $fid) {
+      $file_downloads = \Drupal::service('islandora_matomo.default')->getDownloadsForFile($fid);
+      global $sum;
+      $sum = $sum + $file_downloads;
     }
-    return $_islandora_matomo_sum;
+    return $sum;
   }
 
   /**
