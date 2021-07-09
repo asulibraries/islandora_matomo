@@ -1,0 +1,10 @@
+# islandora_matomo.libraries.yml
+track:
+  version: 1.x
+  header: true
+  js:
+    js/islandora_matomo.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupal.dialog.ajax #Required for dialogs

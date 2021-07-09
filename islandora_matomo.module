@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Contains islandora_matomo.module.
+ */
+
+function islandora_matomo_preprocess_node(array &$variables) {
+  \Drupal::logger('islandora_matomo')->info(t("Node view mode @mode.", ['@mode' => $variables['view_mode']]));
+  if (!$variables["teaser"]) {
+    $islandora_utils = \Drupal::service('islandora.utils');
+    $servicefile_term = $islandora_utils->getTermForUri('http://pcdm.org/use#ServiceFile');
+    $servicefile = $islandora_utils->getMediaWithTerm($variables['node'], $servicefile_term);
+    if (is_object($servicefile) && ($servicefile->bundle() == 'video' ||
+      $servicefile->bundle() == 'remote_video' || $servicefile->bundle() == 'audio')) {
+      \Drupal::logger('islandora_matomo')->info(t("Service file media @bundle.", ['@bundle' => $servicefile->bundle()]));
+      $variables['#attached']['library'] = 'islandora_matomo/track';
+    }
+  }
+}
