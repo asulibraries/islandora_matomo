@@ -160,7 +160,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    */
   public function getDownloadsForFile(array $params) {
     $file = File::load($params['fid']);
-    $file_uri = $file->getFileUri();
+    $file_uri = (is_object($file) ? $file->getFileUri() : NULL);
     $params['url'] = file_create_url($file_uri);
     $params['mode'] = 'downloads';
     $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
@@ -200,11 +200,12 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       'fits_technical_metadata' => 'field_media_file',
       'image'                   => 'field_media_image',
       'video'                   => 'field_media_video_file',
+      'remote_video'            => ''
     ];
     $media = Media::load($mid);
     $media_bundle = $media->bundle();
     $media_file_field = $media_file_fields["{$media_bundle}"];
-    $media_file_id = $media->{$media_file_field}->target_id;
+    $media_file_id = ($media_file_field) ? $media->{$media_file_field}->target_id : 0;
     return $media_file_id;
   }
 
