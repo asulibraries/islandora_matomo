@@ -6,8 +6,6 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Render\Markup;
 use Drupal\media\Entity\Media;
 
-
-
 /**
  * Provides a 'IslandoraNodeAllMediaDownloadsBlock' block.
  *
@@ -24,7 +22,7 @@ class IslandoraNodeAllMediaDownloadsBlock extends BlockBase {
   public function build() {
     if (\Drupal::routeMatch()->getRouteName() == 'entity.node.canonical') {
 
-      // Get views for node
+      // Get views for node.
       $node = \Drupal::routeMatch()->getParameter('node');
       $views = \Drupal::service('islandora_matomo.default')->getViewsForNode(['nid' => $node->id()]);
       $mids = \Drupal::entityQuery('media')
@@ -53,6 +51,9 @@ class IslandoraNodeAllMediaDownloadsBlock extends BlockBase {
     ];
   }
 
+  /**
+   *
+   */
   public function getCacheMaxAge() {
     return 0;
   }

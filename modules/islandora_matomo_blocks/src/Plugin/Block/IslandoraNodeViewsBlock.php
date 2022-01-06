@@ -5,7 +5,6 @@ namespace Drupal\islandora_matomo_blocks\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Render\Markup;
 
-
 /**
  * Provides a 'IslandoraNodeViewsBlock' block.
  *
@@ -38,6 +37,9 @@ EOS;
     ];
   }
 
+  /**
+   *
+   */
   public function getCacheMaxAge() {
     return 0;
   }

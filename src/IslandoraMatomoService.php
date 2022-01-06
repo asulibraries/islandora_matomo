@@ -6,7 +6,6 @@ use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
 use Drupal\file\Entity\File;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Url;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -45,9 +44,9 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Query the Matomo API.
    *
    * @param array $params
-   *  May optionally include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
-   *  May optionally include $params['segment'], required for $params['mode'] 'items_in_matomo'.
+   *   May optionally include $params['url'], the URL to be queried, and $params['mode'] as 'views' or 'downloads'.
+   *   May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   *   May optionally include $params['segment'], required for $params['mode'] 'items_in_matomo'.
    */
   public function queryMatomoApi(array $params) {
     $matomo_config = \Drupal::config('matomo.settings');
@@ -56,7 +55,8 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $matomo_hits_or_visits = \Drupal::config('islandora_matomo.settings')->get('islandora_matomo_hits_or_visits');
     $matomo_metric = ($matomo_hits_or_visits == 0 ? 'nb_hits' : 'nb_visits');
     $matomo_token = \Drupal::config('islandora_matomo.settings')->get('islandora_matomo_user_token');
-    $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : ''); // If no token is configured, assume anonymous viewing
+    // If no token is configured, assume anonymous viewing.
+    $matomo_token_param = ($matomo_token != '' ? "&token_auth={$matomo_token}" : '');
     if ($matomo_url == '' || $matomo_id == '') {
       $this->messenger->addMessage(t('Error: Matomo not configured. Please make sure Matomo URL and site ID are set.'), 'error');
       return NULL;
@@ -106,11 +106,13 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
                 }
               }
               $result = $node_views;
-            } else {
+            }
+            else {
               if (array_key_exists('result', $resource) && $resource['result'] == 'error') {
                 \Drupal::logger('islandora_matomo')->warning("Error returned from Matomo : <pre>" . print_r($resource, TRUE) . "</pre>");
                 $result = 0;
-              } else {
+              }
+              else {
                 $result = (array_key_exists(0, $resource) ? (int) $resource[0][$matomo_metric] : 0);
               }
             }
@@ -128,8 +130,8 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Get views for node.
    *
    * @param array $params
-   *  Array that must include $params['nid'], the node ID of the node to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   *   Array that must include $params['nid'], the node ID of the node to be queried.
+   *   May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getViewsForNode(array $params) {
     $node = Node::load($params['nid']);
@@ -155,24 +157,29 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Get download counts for single file.
    *
    * @param array $params
-   *  Array that must include $params['fid'], the file entity ID of the file to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   *   Array that must include $params['fid'], the file entity ID of the file to be queried.
+   *   May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getDownloadsForFile(array $params) {
     $file = File::load($params['fid']);
     $file_uri = (is_object($file) ? $file->getFileUri() : NULL);
-    $params['url'] = file_create_url($file_uri);
-    $params['mode'] = 'downloads';
-    $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
-    return $downloads;
+    if ($file_uri) {
+      $params['url'] = file_create_url($file_uri);
+      $params['mode'] = 'downloads';
+      $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
+      return $downloads;
+    }
+    else {
+      return 0;
+    }
   }
 
   /**
    * Calculate sum of downloads.
    *
    * @param array $params
-   *  Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
-   *  May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
+   *   Array that must include $params['fids'], an array of file entity IDs of the files to be queried.
+   *   May optionally include  $params['start_date'] and/or $params['end_date'] if a range is desired.
    */
   public function getSummedDownloadsForFiles(array $params) {
     $_islandora_matomo_sum = 0;
@@ -189,7 +196,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
    * Get file-containing field from arbitrary Islandora media entities.
    *
    * @param int $mid
-   * An integer representing a media entity ID.
+   *   An integer representing a media entity ID.
    */
   public function getFileFromMedia(int $mid) {
     $media_file_fields = [
@@ -200,7 +207,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
       'fits_technical_metadata' => 'field_media_file',
       'image'                   => 'field_media_image',
       'video'                   => 'field_media_video_file',
-      'remote_video'            => ''
+      'remote_video'            => '',
     ];
     $media = Media::load($mid);
     $media_bundle = $media->bundle();

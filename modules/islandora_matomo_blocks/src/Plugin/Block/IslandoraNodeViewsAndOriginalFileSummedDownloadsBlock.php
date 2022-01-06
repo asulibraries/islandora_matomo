@@ -4,9 +4,6 @@ namespace Drupal\islandora_matomo_blocks\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Render\Markup;
-use Drupal\media\Entity\Media;
-
-
 
 /**
  * Provides a 'IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock' block.
@@ -24,10 +21,10 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
   public function build() {
     if (\Drupal::routeMatch()->getRouteName() == 'entity.node.canonical') {
 
-      // Get views for node
+      // Get views for node.
       $node = \Drupal::routeMatch()->getParameter('node');
       $views = \Drupal::service('islandora_matomo.default')->getViewsForNode(['nid' => $node->id()]);
-      // Get downloads for Original File media of node
+      // Get downloads for Original File media of node.
       $original_file_tid = key(\Drupal::entityTypeManager()
         ->getStorage('taxonomy_term')
         ->loadByProperties(['name' => "Original File"]));
@@ -35,7 +32,7 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
         ->condition('field_media_of', $node->id())
         ->condition('field_media_use', $original_file_tid)
         ->execute();
-      $fids = array();
+      $fids = [];
       foreach ($original_file_mids as $mid) {
         $fid = \Drupal::service('islandora_matomo.default')->getFileFromMedia($mid);
         $fids[] = $fid;
@@ -57,6 +54,9 @@ EOS;
     ];
   }
 
+  /**
+   *
+   */
   public function getCacheMaxAge() {
     return 0;
   }
