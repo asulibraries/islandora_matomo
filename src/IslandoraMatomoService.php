@@ -212,8 +212,11 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $media = Media::load($mid);
     $media_bundle = $media->bundle();
     $media_file_field = $media_file_fields["{$media_bundle}"];
-    $media_file_id = ($media_file_field) ? $media->{$media_file_field}->target_id : 0;
-    return $media_file_id;
+    if ($media->{$media_file_field} != NULL){
+      $media_file_id = $media->{$media_file_field}->target_id;
+      return $media_file_id;
+    }
+    return NULL;
   }
 
 }
