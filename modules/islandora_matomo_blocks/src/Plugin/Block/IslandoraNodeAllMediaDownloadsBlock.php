@@ -26,6 +26,7 @@ class IslandoraNodeAllMediaDownloadsBlock extends BlockBase {
       $node = \Drupal::routeMatch()->getParameter('node');
       $views = \Drupal::service('islandora_matomo.default')->getViewsForNode(['nid' => $node->id()]);
       $mids = \Drupal::entityQuery('media')
+        ->accessCheck(TRUE)
         ->condition('field_media_of', $node->id())
         ->execute();
       $media_data = [];

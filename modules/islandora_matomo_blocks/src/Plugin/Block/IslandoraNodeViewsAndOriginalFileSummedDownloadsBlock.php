@@ -29,6 +29,7 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
         ->getStorage('taxonomy_term')
         ->loadByProperties(['name' => "Original File"]));
       $original_file_mids = \Drupal::entityQuery('media')
+        ->accessCheck(TRUE)
         ->condition('field_media_of', $node->id())
         ->condition('field_media_use', $original_file_tid)
         ->execute();
