@@ -164,7 +164,7 @@ class IslandoraMatomoService implements IslandoraMatomoServiceInterface {
     $file = File::load($params['fid']);
     $file_uri = (is_object($file) ? $file->getFileUri() : NULL);
     if ($file_uri) {
-      $params['url'] = file_create_url($file_uri);
+      $params['url'] = \Drupal::service('file_url_generator')->generateAbsoluteString($file_uri);
       $params['mode'] = 'downloads';
       $downloads = \Drupal::service('islandora_matomo.default')->queryMatomoApi($params);
       return $downloads;
