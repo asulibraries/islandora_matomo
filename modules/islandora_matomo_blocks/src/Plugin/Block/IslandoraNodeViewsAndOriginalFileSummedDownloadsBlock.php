@@ -31,6 +31,7 @@ class IslandoraNodeViewsAndOriginalFileSummedDownloadsBlock extends BlockBase {
       $original_file_mids = \Drupal::entityQuery('media')
         ->condition('field_media_of', $node->id())
         ->condition('field_media_use', $original_file_tid)
+        ->accessCheck(FALSE)
         ->execute();
       $fids = [];
       foreach ($original_file_mids as $mid) {

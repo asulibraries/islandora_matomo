@@ -2,7 +2,6 @@ name: Islandora Matomo
 type: module
 description: 'Ways to use Matomo with Islandora objects.'
 package: Islandora
-core: 8.x
 dependencies:
     - matomo
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
